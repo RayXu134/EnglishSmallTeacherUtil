@@ -33,9 +33,15 @@ int func_read(char *filepath) {
   int student_count = HASH_COUNT(students);
   Students *sorted[student_count];
   sort_students_by_names(sorted, students);
+
+  printf("Listing students:\n");
+  printf("+----+-------+------+-------+\n");
+  printf("| No | Group | Name | Point |\n");
+  printf("+----+-------+------+-------+\n");
   for (int i = 0; i < student_count; i++) {
-    printf("[Info] (%2d) '%s' in group '%s': %d\n", i, sorted[i]->name, sorted[i]->info.group, sorted[i]->info.point);
+    printf("| %2d | %5s | %4s | %5d |\n", i, sorted[i]->info.group, sorted[i]->name, sorted[i]->info.point);
   }
+  printf("+----+-------+------+-------+\n");
 
   fclose(input_file);
   free_students(&students);
