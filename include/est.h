@@ -41,12 +41,24 @@ void free_groups(Groups **groups);
 
 
 // ==============================
+// Line Reader
+// ==============================
+
+typedef struct {
+  size_t buffer_capacity;
+  size_t buffer_count;
+  char *buffer;
+} LineReader;
+
+char *read_line(FILE *file, LineReader *lr);
+
+void line_reader_free(LineReader *lr);
+
+// ==============================
 // Functions
 // ==============================
 
 int read_input_file(FILE *file, Students **students, Groups **groups);
-
-void free_buffer();
 
 int calculate_final(Students *students, Groups *groups);
 

@@ -1,5 +1,6 @@
 #include "est.h"
 #include "uthash.h"
+#include "util.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -26,18 +27,14 @@ void free_groups(Groups **groups) {
 }
 
 
-size_t buffer_capacity = 0;
-size_t buffer_count = 0;
-char *buffer = NULL;
-
 // Read the entire line without the trailing '\n'.
-char *read_line(FILE *file) {
-  buffer_count = 0;
+char *read_line(FILE *file, LineReader *lr) {
+  lr->buffer_count = 0;
 
-  if (buffer_capacity == 0) {
-    buffer_capacity = 128;
-    buffer = malloc(buffer_capacity);
-    if (buffer == NULL) return NULL;
+  if (lr->buffer_capacity == 0) {
+    lr->buffer_capacity = 128;
+    lr->buffer = malloc(lr->buffer_capacity);
+    if (lr->buffer == NULL) return NULL;
   }
 
   int c;
@@ -46,25 +43,25 @@ char *read_line(FILE *file) {
       break;
     }
 
-    if (buffer_count + 1 >= buffer_capacity) {
-      buffer_capacity *= 2;
-      char *new_buffer = realloc(buffer, buffer_capacity);
+    if (lr->buffer_count + 1 >= lr->buffer_capacity) {
+      lr->buffer_capacity *= 2;
+      char *new_buffer = realloc(lr->buffer, lr->buffer_capacity);
       if (new_buffer == NULL) {
-        free(buffer);
+        free(lr->buffer);
         return NULL;
       }
-      buffer = new_buffer;
+      lr->buffer = new_buffer;
     }
 
-    buffer[buffer_count++] = c;
+    lr->buffer[lr->buffer_count++] = c;
   }
 
-  if (buffer_count == 0 && c == EOF) {
+  if (lr->buffer_count == 0 && c == EOF) {
     return NULL;
   }
 
-  buffer[buffer_count] = '\0';
-  return buffer;
+  lr->buffer[lr->buffer_count] = '\0';
+  return lr->buffer;
 }
 
 typedef enum {
@@ -75,11 +72,12 @@ typedef enum {
 } NamespaceType;
 
 int read_input_file(FILE *file, Students **students, Groups **groups) {
-  char *line = NULL;
+  LineReader line_reader = {0};
+  char *line;
 
   NamespaceType current_namespace = NAMESPACE_UNKNOWN;
 
-  while ((line = read_line(file)) != NULL) {
+  while ((line = read_line(file, &line_reader)) != NULL) {
     // Skip empty line.
     if (strlen(line) == 0) continue;
     // Skip comment.
@@ -225,13 +223,15 @@ int read_input_file(FILE *file, Students **students, Groups **groups) {
     }
   }
 
+  line_reader_free(&line_reader);
+
   return 0;
 }
 
-void free_buffer() {
-  free(buffer);
-  buffer_capacity = 0;
-  buffer_count = 0;
+void line_reader_free(LineReader *lr) {
+  free(lr->buffer);
+  lr->buffer_capacity = 0;
+  lr->buffer_count = 0;
 }
 
 
@@ -252,11 +252,8 @@ int calculate_final(Students *students, Groups *groups) {
   return 0;
 }
 
-int compare_students_name(const void *a, const void *b) {
-  Students *stuA = *((Students **) a);
-  Students *stuB = *((Students **)b);
-  if (atoi(stuA->name) != atoi(stuB->name)) return atoi(stuA->name) - atoi(stuB->name);
-  return strcmp(stuA->name, stuB->name);
+int compare_students(const void *a, const void *b) {
+  return compare_student_names(((Students *) a)->name, ((Students *) b)->name);
 }
 
 int sort_students_by_names(Students *sorted[], Students *students) {
@@ -269,7 +266,7 @@ int sort_students_by_names(Students *sorted[], Students *students) {
 
   int count = HASH_COUNT(students);
 
-  qsort(sorted, count, sizeof(Students *), compare_students_name);
+  qsort(sorted, count, sizeof(Students *), compare_students);
 
   return 0;
 }

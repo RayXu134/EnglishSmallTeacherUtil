@@ -8,6 +8,9 @@ CFLAGS =                  \
 $(TARGET): $(SOURCE)
 	gcc $^ -o $@ $(CFLAGS)
 
+clean:
+	rm -f $(TARGET) ./output.ini
+
 asan: $(SOURCE)
 	gcc $^ -o $(TARGET) $(CFLAGS) -fsanitize=address
 
