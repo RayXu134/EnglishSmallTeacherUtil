@@ -2,15 +2,10 @@
 
 source $TEST/split_functions.sh
 
-rm -f output.ini
-
 echo Running $0
 horizontal_split
 
-$TARGET gen output.ini < ./$TEST/test_gen_input.txt
-horizontal_split
+$TARGET read $TEST/test_read_input_file.ini
 
-cat output.ini
 horizontal_split
-
 echo Exiting

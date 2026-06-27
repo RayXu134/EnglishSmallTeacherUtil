@@ -15,4 +15,4 @@ asan: $(SOURCE)
 	gcc $^ -o $(TARGET) $(CFLAGS) -fsanitize=address
 
 valgrind: $(TARGET)
-	valgrind --leak-check=full --show-leak-kinds=all ./$(TARGET) ./input.ini
+	valgrind --leak-check=full --show-leak-kinds=all ./$(TARGET) read ./input.ini
