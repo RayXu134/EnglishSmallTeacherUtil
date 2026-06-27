@@ -185,17 +185,43 @@ int func_gen(char *filepath) {
   return 0;
 }
 
+int func_help(char *program_name) {
+  usage(program_name);
+
+  // Unreachable.
+  return -1;
+}
+
+typedef struct {
+  char *command;
+  int (*func_ptr)(char *);
+} Function;
+
 int main(int argc, char *argv[]) {
   if (argc != 3) {
     usage(argv[0]);
   }
 
+  Function functions[] = {
+    {"gen", func_gen},
+    {"read", func_read},
+    {"help", func_help}
+  };
+  int function_count = sizeof(functions) / sizeof(Function);
+
+  int i;
+  for (i = 0; i < function_count; i++) {
+    if (strcmp(functions[i].command, argv[1]) == 0) {
+      break;
+    }
+  }
+
   int retval = -1;
-  if (strcmp(argv[1], "gen") == 0) {
-    retval =  func_gen(argv[2]);
-  } else if (strcmp(argv[1], "read") == 0) {
-    retval =  func_read(argv[2]);
+  if (i < function_count) {
+    // Command found.
+    retval = functions[i].func_ptr(argv[2]);
   } else {
+    // Command not found.
     printf("[Info] Bad command, check help\n");
     usage(argv[0]);
   }
