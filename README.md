@@ -26,6 +26,12 @@ make
 
 ### Example of input.ini
 
+**Notice that the namespaces must be in this order**
+
+1. Group
+2. GroupPoint
+3. PersonalPoint
+
 ``` ini
 # Group members
 # Syntax: GROUP=MEMBER_A,MEMBER_B,MEMBER_C...
