@@ -38,7 +38,17 @@ int func_read(char *filepath) {
   printf("+-------+------+-------+\n");
   printf("| Group | Name | Point |\n");
   printf("+-------+------+-------+\n");
+  int prev = atoi(sorted[0]->name);
+  int base_five_count = prev % 5;
   for (int i = 0; i < student_count; i++) {
+    int name_int = atoi(sorted[i]->name);
+    base_five_count += name_int - prev;
+    prev = name_int;
+
+    if (base_five_count > 5) {
+      printf("+-------+------+-------+\n");
+      base_five_count %= 5;
+    }
     printf("| %5s | %4s | %5d |\n", sorted[i]->info.group, sorted[i]->name, sorted[i]->info.point);
   }
   printf("+-------+------+-------+\n");
