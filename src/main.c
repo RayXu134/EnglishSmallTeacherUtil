@@ -35,13 +35,13 @@ int func_read(char *filepath) {
   sort_students_by_names(sorted, students);
 
   printf("Listing students:\n");
-  printf("+----+-------+------+-------+\n");
-  printf("| No | Group | Name | Point |\n");
-  printf("+----+-------+------+-------+\n");
+  printf("+-------+------+-------+\n");
+  printf("| Group | Name | Point |\n");
+  printf("+-------+------+-------+\n");
   for (int i = 0; i < student_count; i++) {
-    printf("| %2d | %5s | %4s | %5d |\n", i, sorted[i]->info.group, sorted[i]->name, sorted[i]->info.point);
+    printf("| %5s | %4s | %5d |\n", sorted[i]->info.group, sorted[i]->name, sorted[i]->info.point);
   }
-  printf("+----+-------+------+-------+\n");
+  printf("+-------+------+-------+\n");
 
   fclose(input_file);
   free_students(&students);
