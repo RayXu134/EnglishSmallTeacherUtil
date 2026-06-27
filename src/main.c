@@ -45,6 +45,8 @@ int func_read(char *filepath) {
 }
 
 int func_gen(char *filepath) {
+  int retval = 0;
+
   printf("[Info] Starting ini file generator\n");
 
   LineReader line_reader = {0};
@@ -64,29 +66,31 @@ int func_gen(char *filepath) {
     return -1;
   }
 
-  char **group_names;
+  int group_count = 0;
+  char **group_names = NULL;
 
   int student_capacity = 10;
   int student_count = 0;
-  char **student_names = malloc(sizeof(char *) * student_capacity);
+  char **student_names = calloc(student_capacity, sizeof(char *));
 
   // Read groups.
 
-  int group_count;
   printf("Group count: ");
   fflush(stdout);
   if (scanf("%d", &group_count) != 1) {
     perror("scanf");
-    return -1;
+    retval = -1;
+    goto cleanup;
   }
   if (group_count <= 0) {
     printf("[Error] Please enter a positive integer as group count\n");
-    return -1;
+    retval = -1;
+    goto cleanup;
   }
 
   fgetc(stdin); // Take away the remaining \n.
 
-  group_names = malloc(sizeof(char *) * group_count);
+  group_names = calloc(group_count, sizeof(char *));
 
   fprintf(output_file, "[Group]\n");
 
@@ -98,17 +102,20 @@ int func_gen(char *filepath) {
     fflush(stdout);
     if ((line = read_line(stdin, &line_reader)) == NULL) {
       printf("[Error] Failed to run function read_line\n");
-      return -1;
+      retval = -1;
+      goto cleanup;
     }
 
     // Check length.
     if (strlen(line) == 0) {
       printf("[Error] You must input the group name\n");
-      return -1;
+      retval = -1;
+      goto cleanup;
     }
     if (strlen(line) > MAX_GROUP_NAME) {
       printf("[Error] MAX_GROUP_NAME (%d) exceeded\n", MAX_GROUP_NAME);
-      return -1;
+      retval = -1;
+      goto cleanup;
     }
 
     group_names[i] = strdup(line);
@@ -120,7 +127,8 @@ int func_gen(char *filepath) {
     printf("Enter group %d members (comma seperated): ", i + 1);
     if ((line = read_line(stdin, &line_reader)) == NULL) {
       printf("[Error] Failed to run function read_line\n");
-      return -1;
+      retval = -1;
+      goto cleanup;
     }
 
     // Add comma seperated group members to output file.
@@ -135,8 +143,8 @@ int func_gen(char *filepath) {
         char **temp = realloc(student_names, sizeof(char *) * student_capacity);
         if (temp == NULL) {
           perror("[Error] realloc");
-          free(student_names);
-          return -1;
+          retval = -1;
+          goto cleanup;
         }
         student_names = temp;
       }
@@ -168,6 +176,7 @@ int func_gen(char *filepath) {
   }
 
   // Clean up.
+  cleanup:
 
   fclose(output_file);
   line_reader_free(&line_reader);
@@ -182,7 +191,7 @@ int func_gen(char *filepath) {
   }
   free(student_names);
 
-  return 0;
+  return retval;
 }
 
 int func_help(char *program_name) {
