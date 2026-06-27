@@ -10,7 +10,8 @@ void usage(char *program) {
   exit(-1);
 }
 
-int func_read(char *filepath) {
+int func_read(char **args) {
+  char *filepath = args[2];
   FILE *input_file = fopen(filepath, "r");
 
   if (input_file == NULL) {
@@ -60,7 +61,8 @@ int func_read(char *filepath) {
   return 0;
 }
 
-int func_gen(char *filepath) {
+int func_gen(char **args) {
+  char *filepath = args[2];
   int retval = 0;
 
   printf("[Info] Starting ini file generator\n");
@@ -210,8 +212,9 @@ int func_gen(char *filepath) {
   return retval;
 }
 
-int func_help(char *program_name) {
-  usage(program_name);
+int func_help(char **args) {
+  printf("[Info] Displaying help\n");
+  usage(args[0]);
 
   // Unreachable.
   return -1;
@@ -219,24 +222,21 @@ int func_help(char *program_name) {
 
 typedef struct {
   char *command;
-  int (*func_ptr)(char *);
+  int (*func_ptr)(char **);
+  int arguments;
 } Function;
 
 int main(int argc, char *argv[]) {
-  if (argc != 3) {
-    usage(argv[0]);
-  }
-
   Function functions[] = {
-    {"gen", func_gen},
-    {"read", func_read},
-    {"help", func_help}
+    {"gen", func_gen, 1},
+    {"read", func_read, 1},
+    {"help", func_help, 0}
   };
   int function_count = sizeof(functions) / sizeof(Function);
 
   int i;
   for (i = 0; i < function_count; i++) {
-    if (strcmp(functions[i].command, argv[1]) == 0) {
+    if (strcmp(functions[i].command, argv[1]) == 0 && argc - 2 == functions[i].arguments) {
       break;
     }
   }
@@ -244,7 +244,7 @@ int main(int argc, char *argv[]) {
   int retval = -1;
   if (i < function_count) {
     // Command found.
-    retval = functions[i].func_ptr(argv[2]);
+    retval = functions[i].func_ptr(argv);
   } else {
     // Command not found.
     printf("[Info] Bad command, check help\n");

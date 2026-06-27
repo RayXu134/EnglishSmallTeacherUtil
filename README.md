@@ -17,12 +17,13 @@ Each student has a personal point.
 
 ## Usage
 
-### Build and Run
+### Build
 
 ``` sh
 make
-./main input.ini
 ```
+
+---
 
 ### Example of input.ini
 
@@ -58,3 +59,29 @@ make
 18=9
 ```
 
+---
+
+### Run
+
+There are 3 subcommands, read, gen and help.
+- read: Read an ini file and calculate points.
+- gen: Generate an ini file template for you.
+- help: Print a help message.
+
+#### read
+
+``` sh
+./main read ./input.ini
+```
+
+#### gen
+
+``` sh
+./main gen ./output.ini
+```
+
+#### help
+
+``` sh
+./main help
+```
